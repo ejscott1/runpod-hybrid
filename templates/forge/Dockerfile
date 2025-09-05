@@ -1,22 +1,25 @@
 FROM nvidia/cuda:12.1.1-cudnn8-runtime-ubuntu22.04
-ENV DEBIAN_FRONTEND=noninteractive PYTHONUNBUFFERED=1 PIP_PREFER_BINARY=1 \
-    A1111_DATA=/opt/webui ROOT=/workspace
 
+ENV DEBIAN_FRONTEND=noninteractive \
+    PYTHONUNBUFFERED=1 \
+    PIP_PREFER_BINARY=1 \
+    A1111_DATA=/opt/webui \
+    ROOT=/workspace
+
+# System deps
 RUN apt-get update && apt-get install -y --no-install-recommends \
-    git wget curl unzip ca-certificates python3 python3-venv python3-pip ffmpeg libglib2.0-0 libgl1 \
+    git wget curl unzip ca-certificates python3 python3-pip ffmpeg libglib2.0-0 libgl1 \
  && rm -rf /var/lib/apt/lists/*
 
-# Stable Diffusion Forge
+# Clone Forge
 RUN git clone --depth=1 https://github.com/lllyasviel/stable-diffusion-webui-forge.git ${A1111_DATA}
 
-# Python venv + deps
-RUN python3 -m venv ${A1111_DATA}/venv && \
-    . ${A1111_DATA}/venv/bin/activate && \
-    pip install --upgrade pip wheel setuptools && \
+# Install Python deps directly (no venv)
+RUN pip install --upgrade pip wheel setuptools && \
     (pip install -r ${A1111_DATA}/requirements_versions.txt || true) && \
     pip install -r ${A1111_DATA}/requirements.txt
 
-# Link shared models on container start (from repo root via build context '.')
+# Link shared models on container start
 COPY --chmod=755 scripts/link-models.sh /usr/local/bin/link-models.sh
 
 # Start script
