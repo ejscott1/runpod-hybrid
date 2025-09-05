@@ -1,0 +1,12 @@
+{
+  "name": "Forge (Minimal, shared /workspace)",
+  "containerDiskInGb": 20,
+  "imageName": "ghcr.io/ejscott1/forge:latest",
+  "gpuTypeId": "NVIDIA_A40",
+  "ports": [{ "containerPort": 7860, "hostPort": 7860, "protocol": "TCP" }],
+  "volumeMountPath": "/workspace",
+  "env": [
+    { "key": "WEBUI_ARGS", "value": "--listen --api --xformers --enable-insecure-extension-access --no-half-vae" },
+    { "key": "A1111_DATA", "value": "/opt/webui" }
+  ]
+}
