@@ -16,11 +16,11 @@ RUN python3 -m venv ${A1111_DATA}/venv && \
     (pip install -r ${A1111_DATA}/requirements_versions.txt || true) && \
     pip install -r ${A1111_DATA}/requirements.txt
 
-# Symlink shared models on boot
-COPY --chmod=755 ../../scripts/link-models.sh /usr/local/bin/link-models.sh
+# Link shared models on container start (from repo root via build context '.')
+COPY --chmod=755 scripts/link-models.sh /usr/local/bin/link-models.sh
 
 # Start script
-COPY --chmod=755 ./start.sh /start.sh
+COPY --chmod=755 templates/forge/start.sh /start.sh
 
 EXPOSE 7860
 WORKDIR ${A1111_DATA}
