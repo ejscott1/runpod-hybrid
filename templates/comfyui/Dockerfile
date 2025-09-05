@@ -13,8 +13,11 @@ RUN python3 -m venv ${COMFY_ROOT}/venv && \
     pip install --upgrade pip wheel setuptools && \
     pip install -r ${COMFY_ROOT}/requirements.txt
 
-COPY --chmod=755 ../../scripts/link-models.sh /usr/local/bin/link-models.sh
-COPY --chmod=755 ./start.sh /start.sh
+# Link shared models on container start (from repo root via build context '.')
+COPY --chmod=755 scripts/link-models.sh /usr/local/bin/link-models.sh
+
+# Start script
+COPY --chmod=755 templates/comfyui/start.sh /start.sh
 
 EXPOSE 8188
 WORKDIR ${COMFY_ROOT}
