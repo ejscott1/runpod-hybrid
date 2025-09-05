@@ -19,7 +19,9 @@ jobs:
       packages: write
     steps:
       - uses: actions/checkout@v4
-      - uses: docker/login-action@v3
+
+      - name: Log in to GHCR
+        uses: docker/login-action@v3
         with:
           registry: ghcr.io
           username: ${{ github.actor }}
@@ -28,13 +30,15 @@ jobs:
       - name: Build & push Forge
         uses: docker/build-push-action@v6
         with:
-          context: ./templates/forge
+          context: .                         # build context = repo root
+          file: templates/forge/Dockerfile   # Dockerfile path
           push: true
           tags: ghcr.io/ejscott1/forge:latest
 
       - name: Build & push ComfyUI
         uses: docker/build-push-action@v6
         with:
-          context: ./templates/comfyui
+          context: .
+          file: templates/comfyui/Dockerfile
           push: true
           tags: ghcr.io/ejscott1/comfyui:latest
