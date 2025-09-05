@@ -1,0 +1,12 @@
+{
+  "name": "ComfyUI (Minimal, shared /workspace)",
+  "containerDiskInGb": 20,
+  "imageName": "ghcr.io/ejscott1/comfyui:latest",
+  "gpuTypeId": "NVIDIA_A40",
+  "ports": [{ "containerPort": 8188, "hostPort": 8188, "protocol": "TCP" }],
+  "volumeMountPath": "/workspace",
+  "env": [
+    { "key": "COMFY_ARGS", "value": "--listen 0.0.0.0 --port 8188 --enable-cors-header" },
+    { "key": "COMFY_ROOT", "value": "/opt/ComfyUI" }
+  ]
+}
