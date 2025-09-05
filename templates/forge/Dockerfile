@@ -11,15 +11,18 @@ RUN apt-get update && apt-get install -y --no-install-recommends \
     git wget curl unzip ca-certificates python3 python3-pip ffmpeg libglib2.0-0 libgl1 \
  && rm -rf /var/lib/apt/lists/*
 
-# Clone Forge
+# Clone Stable Diffusion Forge
 RUN git clone --depth=1 https://github.com/lllyasviel/stable-diffusion-webui-forge.git ${A1111_DATA}
 
-# Install Python deps directly (no venv)
+# Python deps (system Python). Install Torch first with CUDA 12.1 wheels, then Forge deps.
 RUN pip install --upgrade pip wheel setuptools && \
+    pip install --index-url https://download.pytorch.org/whl/cu121 \
+        torch torchvision torchaudio && \
     (pip install -r ${A1111_DATA}/requirements_versions.txt || true) && \
-    pip install -r ${A1111_DATA}/requirements.txt
+    pip install -r ${A1111_DATA}/requirements.txt && \
+    (pip install xformers || true)
 
-# Link shared models on container start
+# Link shared models on container start (comes from repo root because build context is '.')
 COPY --chmod=755 scripts/link-models.sh /usr/local/bin/link-models.sh
 
 # Start script
@@ -27,5 +30,7 @@ COPY --chmod=755 templates/forge/start.sh /start.sh
 
 EXPOSE 7860
 WORKDIR ${A1111_DATA}
+
+# You can override WEBUI_ARGS in the RunPod template/env
 ENV WEBUI_ARGS="--listen --api --xformers --enable-insecure-extension-access --no-half-vae"
 ENTRYPOINT ["/start.sh"]
