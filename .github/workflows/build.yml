@@ -1,0 +1,40 @@
+name: Build & Push (Minimal Forge + ComfyUI)
+
+on:
+  push:
+    branches: [ main ]
+    paths:
+      - 'templates/**'
+      - 'scripts/**'
+      - '.github/workflows/build.yml'
+      - 'README.md'
+      - '.dockerignore'
+  workflow_dispatch:
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      packages: write
+    steps:
+      - uses: actions/checkout@v4
+      - uses: docker/login-action@v3
+        with:
+          registry: ghcr.io
+          username: ${{ github.actor }}
+          password: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Build & push Forge
+        uses: docker/build-push-action@v6
+        with:
+          context: ./templates/forge
+          push: true
+          tags: ghcr.io/ejscott1/forge:latest
+
+      - name: Build & push ComfyUI
+        uses: docker/build-push-action@v6
+        with:
+          context: ./templates/comfyui
+          push: true
+          tags: ghcr.io/ejscott1/comfyui:latest
